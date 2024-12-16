@@ -2,16 +2,24 @@
 
 @section('content')
     <div class="row g-4">
+        @if (Session::get('failed'))
+            <div class="alert alert-warning alert-dismissible fade show shadow-sm" role="alert">
+                {{ Session::get('failed') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
         <!-- Bagian Kiri - Informasi -->
-        {{-- <div class="col-lg-4">
+        <div class="col-lg-4">
             <div class="info-section shadow bg-light">
                 <h4 class="mb-4">Informasi Pembuatan Pengaduan</h4>
                 <ul class="list-unstyled">
                     <li class="mb-3"><i class="fas fa-check-circle me-2 text-primary"></i>Pilih provinsi tempat kejadian
                     </li>
-                    <li class="mb-3"><i class="fas fa-check-circle me-2 text-primary"></i>Isi detail pengaduan dengan jelas
+                    <li class="mb-3"><i class="fas fa-check-circle me-2 text-primary"></i>Isi detail pengaduan dengan
+                        jelas
                     </li>
-                    <li class="mb-3"><i class="fas fa-check-circle me-2 text-primary"></i>Sertakan bukti pendukung jika ada
+                    <li class="mb-3"><i class="fas fa-check-circle me-2 text-primary"></i>Sertakan bukti pendukung jika
+                        ada
                     </li>
                     <li class="mb-3"><i class="fas fa-check-circle me-2 text-primary"></i>Pastikan data yang diisi valid
                     </li>
@@ -24,24 +32,19 @@
                     </li>
                 </ul>
             </div>
-        </div> --}}
+        </div>
 
         <!-- Bagian Kanan - Daftar Pengaduan -->
         <div class="col-lg-8">
             <div id="complaintsList" class="bg-white p-4 rounded-4 shadow">
-                <div class="form-group mb-4">
-                    <label for="provinceDropdown" class="form-label h5">Pilih Provinsi:</label>
-                    <select id="provinceDropdown" class="form-select">
+                <form class="d-flex mb-3" role="search" action="{{ route('report.data-report') }}" method="GET">
+                    <select id="provinceDropdown" class="form-select" name="PROVINCE">
                         <option value="">Semua Provinsi</option>
                     </select>
-                </div>
+                    <button class="btn btn-outline-primary ms-2" type="submit">Search</button>
+                </form>
 
                 <div class="mt-4" id="reportContainer">
-                    <div id="noDataAlert" class="alert alert-info d-flex align-items-center d-none">
-                        <i class="fas fa-info-circle me-2"></i>
-                        Tidak ada pengaduan untuk provinsi yang dipilih.
-                    </div>
-
                     @if ($reports->isEmpty())
                         <div class="alert alert-info d-flex align-items-center">
                             <i class="fas fa-info-circle me-2"></i>
@@ -60,7 +63,7 @@
                                             <small class="text-muted"> | {{ $report->created_at->diffForHumans() }}</small>
                                         </h5>
                                         <a href="{{ route('report.show', $report->id) }}" class="btn btn-primary">
-                                            <i class="fas fa-info-circle me-1"></i> Detail
+                                            <i class="fas fa-eye me-1"></i> Lihat Artikel
                                         </a>
                                     </div>
 
@@ -93,11 +96,15 @@
                                                 <i class="fas fa-thumbs-up me-2"></i>
                                                 <span class="fw-bold">{{ $report->voting }}</span>
                                             </div>
+                                            <div class="stat-item">
+                                                <i class="fas fa-comment me-2"></i>
+                                                <span class="fw-bold">{{ $report->comments->count() }}</span>
+                                            </div>
                                         </div>
 
                                         <!-- Form Vote dan Unvote -->
                                         <div class="d-flex gap-2">
-                                            <form action="{{ route('report.vote', $report->id) }}" method="POST">
+                                            {{-- <form action="{{ route('report.vote', $report->id) }}" method="POST">
                                                 @csrf
                                                 <button type="submit" class="btn btn-outline-primary">
                                                     <i class="fas fa-thumbs-up me-2"></i>Vote
@@ -108,6 +115,18 @@
                                                 <button type="submit" class="btn btn-outline-danger">
                                                     <i class="fas fa-thumbs-down me-2"></i>Unvote
                                                 </button>
+                                            </form> --}}
+                                            <form action="{{ route('report.toggleVote', $report->id) }}" method="POST">
+                                                @csrf
+                                                @if (in_array($report->id, session('voted_reports', [])))
+                                                    <button type="submit" class="btn btn-danger">
+                                                        <i class="fas fa-thumbs-down me-2"></i>Unvote
+                                                    </button>
+                                                @else
+                                                    <button type="submit" class="btn btn-primary">
+                                                        <i class="fas fa-thumbs-up me-2"></i>Vote
+                                                    </button>
+                                                @endif
                                             </form>
                                         </div>
                                     </div>
@@ -254,45 +273,45 @@
         }
 
         /* .pagination {
-            margin-bottom: 0;
-            gap: 0.5rem;
-        }
+                                margin-bottom: 0;
+                                gap: 0.5rem;
+                            }
 
-        .page-link {
-            color: #0d6efd;
-            border: 1px solid #dee2e6;
-            padding: 0.75rem 1rem;
-            border-radius: 0.5rem;
-            margin: 0;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
+                            .page-link {
+                                color: #0d6efd;
+                                border: 1px solid #dee2e6;
+                                padding: 0.75rem 1rem;
+                                border-radius: 0.5rem;
+                                margin: 0;
+                                font-weight: 500;
+                                transition: all 0.3s ease;
+                            }
 
-        .page-link:hover {
-            background-color: #0d6efd;
-            color: white;
-            border-color: #0d6efd;
-            transform: translateY(-2px);
-        }
+                            .page-link:hover {
+                                background-color: #0d6efd;
+                                color: white;
+                                border-color: #0d6efd;
+                                transform: translateY(-2px);
+                            }
 
-        .page-item.active .page-link {
-            background-color: #0d6efd;
-            border-color: #0d6efd;
-            color: white;
-            box-shadow: 0 0.5rem 1rem rgba(13, 110, 253, 0.15);
-        }
+                            .page-item.active .page-link {
+                                background-color: #0d6efd;
+                                border-color: #0d6efd;
+                                color: white;
+                                box-shadow: 0 0.5rem 1rem rgba(13, 110, 253, 0.15);
+                            }
 
-        .page-item.disabled .page-link {
-            color: #6c757d;
-            pointer-events: none;
-            background-color: #f8f9fa;
-            border-color: #dee2e6;
-        }
+                            .page-item.disabled .page-link {
+                                color: #6c757d;
+                                pointer-events: none;
+                                background-color: #f8f9fa;
+                                border-color: #dee2e6;
+                            }
 
-        .pagination .page-item:first-child .page-link,
-        .pagination .page-item:last-child .page-link {
-            border-radius: 0.5rem;
-        } */
+                            .pagination .page-item:first-child .page-link,
+                            .pagination .page-item:last-child .page-link {
+                                border-radius: 0.5rem;
+                            } */
     </style>
 @endpush
 
@@ -319,26 +338,6 @@
                     }
                 });
             }
-
-            $('#provinceDropdown').change(function() {
-                var selectedProvinceName = $(this).val();
-                var noDataAlert = $('#noDataAlert');
-                
-                if (selectedProvinceName === '') {
-                    $('.report-card').show();
-                    noDataAlert.addClass('d-none');
-                } else {
-                    $('.report-card').hide();
-                    var filteredCards = $('.report-card[data-province-name="' + selectedProvinceName + '"]');
-                    
-                    if (filteredCards.length > 0) {
-                        filteredCards.show();
-                        noDataAlert.addClass('d-none');
-                    } else {
-                        noDataAlert.removeClass('d-none');
-                    }
-                }
-            });
         });
     </script>
 @endpush
