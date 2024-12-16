@@ -3,7 +3,7 @@
 @section('content')
     <div class="row g-4">
         <!-- Bagian Kiri - Informasi -->
-        <div class="col-lg-4">
+        {{-- <div class="col-lg-4">
             <div class="info-section shadow bg-light">
                 <h4 class="mb-4">Informasi Pembuatan Pengaduan</h4>
                 <ul class="list-unstyled">
@@ -24,7 +24,7 @@
                     </li>
                 </ul>
             </div>
-        </div>
+        </div> --}}
 
         <!-- Bagian Kanan - Daftar Pengaduan -->
         <div class="col-lg-8">
@@ -125,6 +125,176 @@
         </div>
     </div>
 @endsection
+
+@push('styles')
+    <style>
+        body {
+            background-color: #f0f2f5;
+            color: #1a1a1a;
+        }
+
+        .container {
+            max-width: 1200px;
+        }
+
+        .info-section {
+            background-color: #ffffff;
+            padding: 2.5rem;
+            border-radius: 1rem;
+            border-left: 5px solid #0d6efd;
+        }
+
+        .info-section h4 {
+            color: #0d6efd;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .form-select {
+            padding: 0.8rem;
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .form-select:focus {
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+            border-color: #0d6efd;
+        }
+
+        .card {
+            border: none;
+            border-radius: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .hover-shadow:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0.5rem 2rem rgba(0, 0, 0, 0.15) !important;
+        }
+
+        .card-title {
+            color: #0d6efd;
+            font-weight: 600;
+        }
+
+        .alert-info {
+            background-color: #cfe2ff;
+            color: #084298;
+            border: none;
+            border-radius: 0.5rem;
+        }
+
+        .badge {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            padding: 0.5rem 1.5rem;
+            font-weight: 500;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(13, 110, 253, 0.15);
+        }
+
+        .btn-outline-primary {
+            border: 2px solid #0d6efd;
+            padding: 0.5rem 1.5rem;
+            font-weight: 500;
+            border-radius: 0.5rem;
+        }
+
+        .btn-outline-primary:hover {
+            background-color: #0d6efd;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-outline-danger {
+            border: 2px solid #dc3545;
+            padding: 0.5rem 1.5rem;
+            font-weight: 500;
+            border-radius: 0.5rem;
+        }
+
+        .btn-outline-danger:hover {
+            background-color: #dc3545;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .stats-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 0.5rem;
+        }
+
+        .stat-item {
+            color: #0d6efd;
+            font-size: 1rem;
+        }
+
+        .shadow {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08) !important;
+        }
+
+        img.img-fluid {
+            border-radius: 0.5rem;
+            max-height: 300px;
+            object-fit: cover;
+            width: 100%;
+        }
+
+        /* .pagination {
+            margin-bottom: 0;
+            gap: 0.5rem;
+        }
+
+        .page-link {
+            color: #0d6efd;
+            border: 1px solid #dee2e6;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            margin: 0;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .page-link:hover {
+            background-color: #0d6efd;
+            color: white;
+            border-color: #0d6efd;
+            transform: translateY(-2px);
+        }
+
+        .page-item.active .page-link {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+            color: white;
+            box-shadow: 0 0.5rem 1rem rgba(13, 110, 253, 0.15);
+        }
+
+        .page-item.disabled .page-link {
+            color: #6c757d;
+            pointer-events: none;
+            background-color: #f8f9fa;
+            border-color: #dee2e6;
+        }
+
+        .pagination .page-item:first-child .page-link,
+        .pagination .page-item:last-child .page-link {
+            border-radius: 0.5rem;
+        } */
+    </style>
+@endpush
 
 @push('script')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

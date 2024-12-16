@@ -12,12 +12,10 @@ class ReportController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
-        $reports = Report::orderBy('created_at', 'desc')->with('responses')->get();
+        $reports = Report::where('province', 'LIKE', '%' . $request->PROVINCE . '%')->orderBy('created_at', 'desc')->with('responses', 'comments')->get();
 
-        // Kirim data laporan ke view
         return view('reports.report', compact('reports'));
     }
 
@@ -26,7 +24,6 @@ class ReportController extends Controller
      */
     public function create()
     {
-        //
         return view('reports.create');
     }
 
@@ -35,7 +32,6 @@ class ReportController extends Controller
      */
     public function store(Request $request)
     {
-        // Validasi input
         $validated = $request->validate([
             'description' => 'required|string|max:1000',
             'type'        => 'required|in:KEJAHATAN,PEMBANGUNAN,SOSIAL',
@@ -44,29 +40,27 @@ class ReportController extends Controller
             'subdistrict' => 'required|string|max:255',
             'village'     => 'required|string|max:255',
             'image'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'statement'   => 'required|boolean',
         ]);
 
-        // Simpan laporan baru
         $report = new Report();
-        $report->user_id = Auth::id(); // Ambil ID user yang sedang login
+        $report->user_id = Auth::id();
         $report->description = $validated['description'];
         $report->type = $validated['type'];
         $report->province = $validated['province'];
         $report->regency = $validated['regency'];
         $report->subdistrict = $validated['subdistrict'];
         $report->village = $validated['village'];
+        $report->statement = $validated['statement'];
         $report->voting = 0;
         $report->viewers = 0;
-        $report->statement;
 
-        // Jika ada file gambar, simpan di storage dan simpan path-nya
         if ($request->hasFile('image')) {
             $report->image = $request->file('image')->store('reports', 'public');
         }
 
         $report->save();
 
-        // Redirect dengan pesan sukses
         return redirect()->back()->with('success', 'Laporan berhasil dibuat.');
     }
 
@@ -75,7 +69,7 @@ class ReportController extends Controller
      */
     public function show($id)
     {
-        $report = Report::with('comments')->findOrFail($id); // Ambil laporan dengan komentar terkait
+        $report = Report::with('comments')->findOrFail($id);
 
         $report->viewers += 1;
         $report->save();
@@ -83,13 +77,7 @@ class ReportController extends Controller
         return view('reports.show', compact('report'));
     }
 
-    /**
-     * Menyimpan komentar pada pengaduan.
-     *
-     * @param \Illuminate\Http\Request $request
-     * @param int $id
-     * @return \Illuminate\Http\RedirectResponse
-     */
+
     public function storeComment(Request $request, $id)
     {
         $request->validate([
@@ -100,14 +88,13 @@ class ReportController extends Controller
 
         Comment::create([
             'report_id' => $report->id,
+            'user_id' => auth()->id(),
             'comment' => $request->comment,
-            'user_id' => auth()->id(), // Mengambil ID pengguna yang login
         ]);
 
         return redirect()->route('report.show', $id)->with('success', 'Komentar berhasil ditambahkan.');
     }
 
-    // app/Http/Controllers/ReportController.php
     public function myReports()
     {
         $user = auth()->user();
@@ -141,36 +128,39 @@ class ReportController extends Controller
         $report = Report::findOrFail($id);
         $report->delete();
 
-        return redirect()->route('report.data-report')->with('success', 'Laporan berhasil dihapus.');
+        return redirect()->route('report.myReports')->with('success', 'Laporan berhasil dihapus.');
     }
 
-    public function vote($id)
+
+    public function toggleVote($id)
     {
-        // Cari data laporan berdasarkan ID
         $report = Report::findOrFail($id);
 
-        // Tambahkan jumlah voting
-        $report->voting += 1;
-        $report->save();
+        // Ambil daftar laporan yang sudah divote dari sesi
+        $votedReports = session('voted_reports', []);
 
-        // Redirect kembali ke halaman sebelumnya dengan pesan sukses
-        return redirect()->back()->with('success', 'Vote berhasil ditambahkan.');
-    }
-
-    public function unvote($id)
-    {
-        // Cari data laporan berdasarkan ID
-        $report = Report::findOrFail($id);
-
-        // Kurangi jumlah voting
-        $report->voting -= 1;
-        $report->save();
-        if ($report->voting < 0) {
-            $report->voting = 0;
+        if (in_array($id, $votedReports)) {
+            // Jika sudah divote, kurangi jumlah vote dan hapus dari sesi
+            $report->voting -= 1;
             $report->save();
+
+            // Hapus ID laporan dari array
+            $votedReports = array_diff($votedReports, [$id]);
+            session(['voted_reports' => $votedReports]);
+
+            $message = 'Vote berhasil dihapus.';
+        } else {
+            // Jika belum divote, tambahkan jumlah vote dan simpan ke sesi
+            $report->voting += 1;
+            $report->save();
+
+            // Tambahkan ID laporan ke array
+            $votedReports[] = $id;
+            session(['voted_reports' => $votedReports]);
+
+            $message = 'Vote berhasil ditambahkan.';
         }
 
-        // Redirect kembali ke halaman sebelumnya dengan pesan sukses
-        return redirect()->back()->with('success', 'Vote berhasil dihapus.');
+        return redirect()->back()->with('success', $message);
     }
 }
