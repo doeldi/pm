@@ -9,65 +9,61 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    public function showLoginForm()
+    public function showLoginRegisterForm()
     {
-        return view('auth.login');
+        return view('auth.login-register');
     }
 
-    public function login(Request $request)
+    public function loginRegister(Request $request)
     {
-        // Validasi input
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|min:6',
-        ]);
+        $action = $request->input('action');
+ 
+        if ($action === 'login') {
+            $request->validate([
+                'email' => 'required|email',
+                'password' => 'required|min:6',
+            ]);
 
-        // Ambil data login
-        $credentials = $request->only('email', 'password');
+            if (Auth::attempt($request->only('email', 'password'))) {
+                if (Auth::user()->role === 'HEAD_STAFF') {
+                    return redirect()->intended('/headstaff/data');
+                } elseif (Auth::user()->role === 'STAFF') {
+                    return redirect()->intended('/responses/responses');
+                } else {
+                    return redirect()->intended('/reports/article');
+                }
+            }
 
-        // Proses login
-        if (Auth::attempt($credentials)) {
-            // Redirect ke halaman dashboard atau halaman yang diinginkan
-            return redirect()->intended('/');
+            return back()->withErrors(['email' => 'Email atau password salah.'])->withInput();
+        } elseif ($action === 'register') {
+            $request->validate([
+                'email' => 'required|string|email|max:255|unique:users',
+                'password' => 'required|string|min:6|confirmed',
+            ]);
+
+            $user = User::create([
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => 'GUEST',
+            ]);
+
+            Auth::login($user);
+            if (Auth::user()->role === 'HEAD_STAFF') {
+                return redirect()->intended('/staff');
+            } elseif (Auth::user()->role === 'STAFF') {
+                return redirect()->intended('/responses/responses');
+            } else {
+                return redirect()->intended('/reports/article');
+            }
         }
 
-        // Jika login gagal, kembalikan ke halaman login dengan pesan error
-        return back()->withErrors([
-            'email' => 'Email atau password salah.',
-        ])->withInput();
+        return back()->withErrors(['action' => 'Aksi tidak valid.']);
     }
 
+    
     public function logout()
     {
         Auth::logout();
-        return redirect('/login');
-    }
-    
-    public function showRegistrationForm()
-    {
-        return view('auth.register');
-    }
-
-    public function register(Request $request)
-    {
-        // Validasi input
-        $request->validate([
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6|confirmed',
-        ]);
-
-        // Buat user baru
-        $user = User::create([
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            // default role is 'GUEST'
-            'role' => 'GUEST',
-        ]);
-
-        // Login otomatis setelah registrasi
-        Auth::login($user);
-
-        // Redirect ke halaman dashboard
-        return redirect()->intended('/');
+        return redirect('/auth');
     }
 }

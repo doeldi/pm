@@ -1,9 +1,6 @@
-<!-- resources/views/staff/index.blade.php -->
 @extends('layouts.layout')
 
 @section('content')
-    <h1 class="mb-4">Kelola Staff</h1>
-
     <!-- Form Tambah Staff -->
     <div class="card mb-4 shadow-sm">
         <div class="card-header bg-primary text-white">
@@ -68,7 +65,7 @@
                         @foreach ($staffs as $staff)
                             <tr>
                                 <td>{{ $staff->email }}</td>
-                                <td>{{ $staff->staffProvinces->first()->province ?? '-' }}</td>
+                                <td>{{ $staff->staffProvinces->province ?? '-' }}</td>
                                 <td>
                                     <div class="btn-group" role="group">
                                         <!-- Tombol Reset Password -->

@@ -19,7 +19,11 @@ class isGuest
         if (Auth::user()->role == 'GUEST') {
             return $next($request);
         } else {
-            return redirect()->route('home')->with('failed', 'Anda bukan guest!');
+            if (Auth::user()->role == 'HEAD_STAFF') {
+                return redirect()->route('staff.index')->with('failed', 'Anda bukan guest');
+            } else {
+                return redirect()->route('responses.index')->with('failed', 'Anda bukan guest');
+            } 
         }
     }
 }

@@ -15,10 +15,19 @@ class ResponseController extends Controller
      */
     public function index()
     {
-        // Cuma tampilkan data yang sesuai dengan provinsi si staff
-        $reports = Report::with('responses')
-            ->where('province', Auth::user()->province)
+        // Ambil provinsi user login
+        $user = Auth::user();
+        $province = $user->staffProvinces->province ?? null;
+
+        if (!$province) {
+            return redirect()->back()->with('error', 'Provinsi Anda tidak ditemukan.');
+        }
+
+        // Ambil laporan dari provinsi user
+        $reports = Report::with('responses', 'user')
+            ->where('province', $province)
             ->get();
+
         return view('response.index', compact('reports'));
     }
 
@@ -27,8 +36,7 @@ class ResponseController extends Controller
      */
     public function create()
     {
-        // Ambil semua laporan untuk dropdown pilihan
-
+        // 
     }
 
     /**
@@ -68,7 +76,6 @@ class ResponseController extends Controller
      */
     public function show(string $id)
     {
-        // Ambil response dengan semua progress-nya
         $response = Response::with('report', 'progress')->findOrFail($id);
 
         return view('response.show', compact('response'));
@@ -79,8 +86,7 @@ class ResponseController extends Controller
      */
     public function edit(string $id)
     {
-        $response = Response::findOrFail($id);
-        return view('response.edit', compact('response'));
+        //
     }
 
     /**
@@ -99,16 +105,14 @@ class ResponseController extends Controller
     /**
      * Remove the specified response from storage.
      */
+    /**
+     * Remove the specified progress from storage.
+     */
     public function destroy(string $id)
     {
-        $response = Response::findOrFail($id);
+        $progress = ResponseProgress::findOrFail($id);
+        $progress->delete();
 
-        // Periksa apakah tanggapan pernah tertaut dengan pengaduan
-        if ($response->report->is_responded) {
-            return redirect()->route('response.index')->with('error', 'Tanggapan tidak dapat dihapus karena sudah tertaut dengan laporan.');
-        }
-
-        $response->delete();
-        return redirect()->route('response.index')->with('success', 'Tanggapan berhasil dihapus.');
+        return redirect()->back()->with('success', 'Progress berhasil dihapus.');
     }
 }

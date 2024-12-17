@@ -1,31 +1,82 @@
 <?php
 
-// app/Http/Controllers/StaffController.php
 namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\StaffProvince;
+use App\Models\Report;
+use App\Models\Response;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+
 
 class UserController extends Controller
 {
-    // Menampilkan daftar staff
-    public function index()
+    public function index(Request $request)
     {
-        $staffs = User::where('role', 'STAFF')->with('staffProvinces')->get();
+        // Menghitung jumlah laporan berdasarkan provinsi
+        $userProvince = Auth::user()->staffProvinces->province;
+        
+        $reportsByProvince = Report::selectRaw('province, COUNT(*) as total_reports')
+            ->where('province', 'LIKE', '%' . $userProvince . '%')
+            ->groupBy('province')
+            ->get();
+
+        // Menghitung jumlah tanggapan berdasarkan provinsi
+        $responsesByProvince = Response::selectRaw('reports.province, COUNT(responses.id) as total_responses')
+            ->join('reports', 'responses.report_id', '=', 'reports.id')
+            ->where('reports.province', 'LIKE', '%' . $userProvince . '%')
+            ->groupBy('reports.province')
+            ->get();
+
+        // Data statistik lainnya
+        $statistics = [
+            'totalReports' => Report::where('province', 'LIKE', '%' . $userProvince . '%')->count(),
+            'totalResponses' => Response::whereHas('report', function($query) use ($userProvince) {
+                $query->where('province', 'LIKE', '%' . $userProvince . '%');
+            })->count(),
+        ];
+
+        return view('hstaff.index', compact('statistics', 'reportsByProvince', 'responsesByProvince'));
+    }
+
+
+    public function create()
+    {
+        $user = Auth::user();
+        $province = Auth::user()->staffProvinces->province;
+
+        $staffs = User::where('role', 'STAFF')
+            ->whereHas('staffProvinces', function($query) use ($province) {
+                $query->where('province', $province);
+            })
+            ->with('staffProvinces')
+            ->get();
+            
         return view('hstaff.create', compact('staffs'));
     }
 
-    // Menghapus staff jika belum pernah tertaut dengan tanggapan pengaduan
-    public function destroy(User $user)
+    // Menambahkan akun staff
+    public function store(Request $request)
     {
-        if ($user->responses()->count() > 0) {
-            return redirect()->back()->with('error', 'Tidak dapat menghapus staff yang memiliki tanggapan.');
-        }
+        $request->validate([
+            'email' => 'required|email|unique:users,email',
+            'province' => 'required|string'
+        ]);
 
-        $user->delete();
-        return redirect()->route('staff.index')->with('success', 'Staff berhasil dihapus.');
+        $user = User::create([
+            'email' => $request->email,
+            'password' => bcrypt($request->password),
+            'role' => 'STAFF',
+        ]);
+
+        StaffProvince::create([
+            'user_id' => $user->id,
+            'province' => $request->province,
+        ]);
+
+        return redirect()->route('staff.create')->with('success', 'Staff berhasil ditambahkan.');
     }
 
     // Reset password menjadi 4 kata awal dari email
@@ -38,28 +89,14 @@ class UserController extends Controller
         return redirect()->route('staff.index')->with('success', 'Password berhasil direset.');
     }
 
-    // Menambahkan akun staff
-    public function store(Request $request)
+    // Menghapus staff jika belum pernah tertaut dengan tanggapan pengaduan
+    public function destroy(User $user)
     {
-        $request->validate([
-            'email' => 'required|email|unique:users,email',
-            'province' => 'required|string'
-        ]);
+        if (Response::where('staff_id', $user->id)->exists()) {
+            return redirect()->back()->with('error', 'Tidak dapat menghapus staff yang memiliki tanggapan.');
+        }
 
-        $emailParts = explode('@', $request->email);
-        $password = substr($emailParts[0], 0, 4) . '1234';
-
-        $user = User::create([
-            'email' => $request->email,
-            'password' => Hash::make($password),
-            'role' => 'STAFF',
-        ]);
-        
-        StaffProvince::create([
-            'user_id' => $user->id,
-            'province' => $request->province,
-        ]);
-
-        return redirect()->route('staff.index')->with('success', 'Staff berhasil ditambahkan.');
+        $user->delete();
+        return redirect()->route('staff.create')->with('success', 'Staff berhasil dihapus.');
     }
 }

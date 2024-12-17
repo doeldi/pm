@@ -6,6 +6,8 @@ use App\Models\Report;
 use App\Models\Comment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\ReportsExport;
 
 class ReportController extends Controller
 {
@@ -14,7 +16,7 @@ class ReportController extends Controller
      */
     public function index(Request $request)
     {
-        $reports = Report::where('province', 'LIKE', '%' . $request->PROVINCE . '%')->orderBy('created_at', 'desc')->with('responses', 'comments')->get();
+        $reports = Report::where('province', 'LIKE', '%' . $request->PROVINCE . '%')->orderBy('created_at', 'desc')->with('responses', 'comments')->simplePaginate(2);
 
         return view('reports.report', compact('reports'));
     }
@@ -32,16 +34,31 @@ class ReportController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'description' => 'required|string|max:1000',
-            'type'        => 'required|in:KEJAHATAN,PEMBANGUNAN,SOSIAL',
-            'province'    => 'required|string|max:255',
-            'regency'     => 'required|string|max:255',
-            'subdistrict' => 'required|string|max:255',
-            'village'     => 'required|string|max:255',
-            'image'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'statement'   => 'required|boolean',
-        ]);
+        $validated = $request->validate(
+            [
+                'description' => 'required|string|max:1000',
+                'type'        => 'required|in:KEJAHATAN,PEMBANGUNAN,SOSIAL',
+                'province'    => 'required|string|max:255',
+                'regency'     => 'required|string|max:255',
+                'subdistrict' => 'required|string|max:255',
+                'village'     => 'required|string|max:255',
+                'image'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                'statement'   => 'required|boolean',
+            ],
+            [
+                'description.required' => 'Deskripsi pengaduan harus diisi.',
+                'type.required'        => 'Jenis pengaduan harus dipilih.',
+                'province.required'    => 'Provinsi harus diisi.',
+                'regency.required'     => 'Kabupaten/Kota harus diisi.',
+                'subdistrict.required' => 'Kecamatan harus diisi.',
+                'village.required'     => 'Kelurahan/Desa harus diisi.',
+                'image.image'          => 'File harus berupa gambar.',
+                'image.mimes'          => 'Format gambar harus jpeg, png, atau jpg.',
+                'image.max'            => 'Ukuran gambar maksimal 2MB.',
+                'statement.required'   => 'Pernyataan harus diisi.',
+                'statement.boolean'    => 'Pernyataan harus berupa nilai boolean (true atau false).',
+            ]
+        );
 
         $report = new Report();
         $report->user_id = Auth::id();
@@ -69,7 +86,7 @@ class ReportController extends Controller
      */
     public function show($id)
     {
-        $report = Report::with('comments')->findOrFail($id);
+        $report = Report::with('comments')->find($id);
 
         $report->viewers += 1;
         $report->save();
@@ -162,5 +179,12 @@ class ReportController extends Controller
         }
 
         return redirect()->back()->with('success', $message);
+    }
+
+    public function export(Request $request)
+    {
+        $fileName = 'report.' . now()->format('Y-m-d') . '.xlsx';
+
+        return Excel::download(new ReportsExport($request), $fileName);
     }
 }

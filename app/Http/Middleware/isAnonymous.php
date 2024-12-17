@@ -19,7 +19,13 @@ class isAnonymous
         if (Auth::check() == FALSE) {
             return $next($request);
         } else {
-            return redirect()->route('home')->with('failed', 'Anda Sudah Login!');
+            if (Auth::user()->role == 'HEAD_STAFF') {
+                return redirect()->route('staff.index')->with('failed', 'Anda Sudah Login!');
+            } else if (Auth::user()->role == 'STAFF') {
+                return redirect()->route('responses.index')->with('failed', 'Anda Sudah Login!');
+            } else {
+                return redirect()->route('report.data-report')->with('failed', 'Anda Sudah Login!');
+            }
         }
     }
 }

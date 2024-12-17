@@ -14,19 +14,6 @@
                             <img src="{{ asset('storage/' . $report->image) }}" class="img-fluid rounded shadow hover-zoom"
                                 alt="Report Image" data-bs-toggle="modal" data-bs-target="#imageModal">
                         </div>
-
-                        <!-- Image Modal -->
-                        <div class="modal fade" id="imageModal" tabindex="-1" aria-labelledby="imageModalLabel"
-                            aria-hidden="true">
-                            <div class="modal-dialog modal-lg modal-dialog-centered">
-                                <div class="modal-content border-0">
-                                    <div class="modal-body p-0">
-                                        <img src="{{ asset('storage/' . $report->image) }}" class="img-fluid"
-                                            alt="Report Image">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 @endif
                 <div class="col-md-{{ $report->image ? '8' : '12' }}">
@@ -55,13 +42,6 @@
                 <i class="fas fa-comments me-3"></i>
                 Komentar
             </h4>
-            @if (session('success'))
-                <div class="alert alert-success alert-dismissible fade show animate__animated animate__fadeIn"
-                    role="alert">
-                    <i class="fas fa-check-circle me-2"></i>{{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            @endif
             <div id="commentList" style="display: none;">
                 @if ($report->comments->isEmpty())
                     <div class="text-center py-5">
@@ -126,4 +106,106 @@
             form.style.display = form.style.display === 'none' ? 'block' : 'none';
         }
     </script>
+    <style>
+        .hover-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .hover-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .hover-zoom {
+            transition: transform 0.3s ease;
+            cursor: pointer;
+        }
+
+        .hover-zoom:hover {
+            transform: scale(1.02);
+        }
+
+        .hover-bg-light:hover {
+            background-color: rgba(13, 110, 253, 0.02);
+            transition: background-color 0.3s ease;
+        }
+
+        .comment-form textarea {
+            transition: all 0.3s ease;
+        }
+
+        .comment-form textarea:focus {
+            box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+            border: none;
+            background-color: #fff;
+        }
+
+        .hover-button {
+            transition: all 0.3s ease;
+        }
+
+        .hover-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+        }
+
+        .info-card {
+            background-color: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+
+        .hover-info:hover {
+            background-color: #fff;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .animate-bounce {
+            animation: bounce 2s infinite;
+        }
+
+        .animate-pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.6;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .image-container {
+            position: relative;
+            overflow: hidden;
+            border-radius: 0.5rem;
+        }
+
+        .modal-content {
+            background-color: transparent;
+        }
+
+        .modal-body {
+            padding: 0;
+        }
+    </style>
 @endsection

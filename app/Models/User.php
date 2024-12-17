@@ -23,7 +23,7 @@ class User extends Authenticatable
 
     public function staffProvinces()
     {
-        return $this->hasMany(StaffProvince::class);
+        return $this->hasOne(StaffProvince::class);
     }
 
     public function comments()

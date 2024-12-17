@@ -103,19 +103,7 @@
                                         </div>
 
                                         <!-- Form Vote dan Unvote -->
-                                        <div class="d-flex gap-2">
-                                            {{-- <form action="{{ route('report.vote', $report->id) }}" method="POST">
-                                                @csrf
-                                                <button type="submit" class="btn btn-outline-primary">
-                                                    <i class="fas fa-thumbs-up me-2"></i>Vote
-                                                </button>
-                                            </form>
-                                            <form action="{{ route('report.unvote', $report->id) }}" method="POST">
-                                                @csrf
-                                                <button type="submit" class="btn btn-outline-danger">
-                                                    <i class="fas fa-thumbs-down me-2"></i>Unvote
-                                                </button>
-                                            </form> --}}
+                                        <div class="d-flex">
                                             <form action="{{ route('report.toggleVote', $report->id) }}" method="POST">
                                                 @csrf
                                                 @if (in_array($report->id, session('voted_reports', [])))
@@ -135,9 +123,9 @@
                             </div>
                         @endforeach
 
-                        {{-- <div class="d-flex justify-content-center mt-4">
+                        <div class="d-flex justify-content-center mt-4">
                             {{ $reports->links('pagination::simple-bootstrap-5') }}
-                        </div> --}}
+                        </div>
                     @endif
                 </div>
             </div>
@@ -272,46 +260,46 @@
             width: 100%;
         }
 
-        /* .pagination {
-                                margin-bottom: 0;
-                                gap: 0.5rem;
-                            }
+        .pagination {
+            margin-bottom: 0;
+            gap: 0.5rem;
+        }
 
-                            .page-link {
-                                color: #0d6efd;
-                                border: 1px solid #dee2e6;
-                                padding: 0.75rem 1rem;
-                                border-radius: 0.5rem;
-                                margin: 0;
-                                font-weight: 500;
-                                transition: all 0.3s ease;
-                            }
+        .page-link {
+            color: #0d6efd;
+            border: 1px solid #dee2e6;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            margin: 0;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
 
-                            .page-link:hover {
-                                background-color: #0d6efd;
-                                color: white;
-                                border-color: #0d6efd;
-                                transform: translateY(-2px);
-                            }
+        .page-link:hover {
+            background-color: #0d6efd;
+            color: white;
+            border-color: #0d6efd;
+            transform: translateY(-2px);
+        }
 
-                            .page-item.active .page-link {
-                                background-color: #0d6efd;
-                                border-color: #0d6efd;
-                                color: white;
-                                box-shadow: 0 0.5rem 1rem rgba(13, 110, 253, 0.15);
-                            }
+        .page-item.active .page-link {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+            color: white;
+            box-shadow: 0 0.5rem 1rem rgba(13, 110, 253, 0.15);
+        }
 
-                            .page-item.disabled .page-link {
-                                color: #6c757d;
-                                pointer-events: none;
-                                background-color: #f8f9fa;
-                                border-color: #dee2e6;
-                            }
+        .page-item.disabled .page-link {
+            color: #6c757d;
+            pointer-events: none;
+            background-color: #f8f9fa;
+            border-color: #dee2e6;
+        }
 
-                            .pagination .page-item:first-child .page-link,
-                            .pagination .page-item:last-child .page-link {
-                                border-radius: 0.5rem;
-                            } */
+        .pagination .page-item:first-child .page-link,
+        .pagination .page-item:last-child .page-link {
+            border-radius: 0.5rem;
+        }
     </style>
 @endpush
 
