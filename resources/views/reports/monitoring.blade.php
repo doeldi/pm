@@ -4,7 +4,7 @@
     <div class="mt-4" id="reportContainer">
         @if ($reports->isEmpty())
             <div class="alert alert-info text-center">
-                Anda belum memiliki pengaduan. 
+                Anda belum memiliki pengaduan.
             </div>
         @else
             @foreach ($reports as $report)
@@ -88,12 +88,14 @@
                                                 <span>Selesai</span>
                                             </div>
                                         </div>
-                                        @if ($report->responses->first() && $report->responses->first()->progress->count() > 0)
-                                            @if ($report->responses->first() && $report->responses->first()->response_status == 'DONE')
-                                                <div class="alert alert-info"><i class="fas fa-check"></i>
-                                                    Pengaduan ini telah selesai.
-                                                </div>
-                                            @else
+                                        @if ($report->responses->first())
+                                            @if ($report->responses->first()->response_status == 'DONE')
+                                                <div class="alert alert-info"><i class="fas fa-check"></i> Pengaduan ini
+                                                    telah selesai.</div>
+                                            @elseif ($report->responses->first()->response_status == 'REJECT')
+                                                <div class="alert alert-danger"><i class="fas fa-times"></i> Pengaduan ini
+                                                    ditolak.</div>
+                                            @elseif ($report->responses->first()->progress->count() > 0)
                                                 <div class="timeline position-relative w-100">
                                                     <div class="timeline-line"></div>
                                                     @foreach ($report->responses->first()->progress as $progress)
@@ -101,18 +103,19 @@
                                                             <div class="timeline-point"></div>
                                                             <div class="timeline-content">
                                                                 <div class="timeline-time">
-                                                                    <i class="fas fa-clock me-1"></i>
-                                                                    {{ $progress->created_at->format('d/m/Y H:i') }}
+                                                                    <i
+                                                                        class="fas fa-clock me-1"></i>{{ $progress->created_at->format('d/m/Y H:i') }}
                                                                 </div>
-                                                                <div class="timeline-body">
-                                                                    {{ $progress->histories }}
-                                                                </div>
+                                                                <div class="timeline-body">{{ $progress->histories }}</div>
                                                             </div>
                                                         </div>
                                                     @endforeach
                                                 </div>
+                                            @else
+                                                <div class="alert alert-warning"><i class="fas fa-info-circle"></i> Menunggu
+                                                    progress</div>
                                             @endif
-                                        @elseif (now()->diffInDays($report->created_at) >= 1 && $report->responses->isEmpty())
+                                        @elseif (now()->diffInDays($report->created_at) >= 1)
                                             <div class="mb-3">
                                                 <small class="text-danger">Staff tidak merespon pengaduan ini selama 24
                                                     jam.</small>
@@ -120,17 +123,13 @@
                                                     data-bs-target="#deleteModal{{ $report->id }}">
                                                     <i class="fas fa-trash"></i> Hapus
                                                 </button>
-
-                                                <!-- Delete Modal -->
-                                                <div class="modal fade" id="deleteModal{{ $report->id }}" tabindex="-1"
-                                                    aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                                <div class="modal fade" id="deleteModal{{ $report->id }}" tabindex="-1">
                                                     <div class="modal-dialog">
                                                         <div class="modal-content">
                                                             <div class="modal-header">
-                                                                <h5 class="modal-title" id="deleteModalLabel">Konfirmasi
-                                                                    Hapus</h5>
+                                                                <h5 class="modal-title">Konfirmasi Hapus</h5>
                                                                 <button type="button" class="btn-close"
-                                                                    data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                    data-bs-dismiss="modal"></button>
                                                             </div>
                                                             <div class="modal-body">
                                                                 <p>Apakah Anda yakin ingin menghapus pengaduan ini?</p>
@@ -151,16 +150,8 @@
                                                 </div>
                                             </div>
                                         @else
-                                            @if ($report->responses->isEmpty())
-                                                <div class="alert alert-danger">
-                                                    <i class="fas fa-info-circle"></i> Belum ada tanggapan
-                                                    yang ditambahkan
-                                                </div>
-                                            @else
-                                                <div class="alert alert-warning">
-                                                    <i class="fas fa-info-circle"></i> Menunggu progress
-                                                </div>
-                                            @endif
+                                            <div class="alert alert-danger"><i class="fas fa-info-circle"></i> Belum ada
+                                                tanggapan yang ditambahkan</div>
                                         @endif
                                     </div>
                                 </div>

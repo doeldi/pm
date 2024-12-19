@@ -73,7 +73,7 @@
                                     </div>
                                     <div class="badge bg-primary mb-3 px-3 py-2">
                                         <i class="fas fa-map-marker-alt me-1"></i>
-                                        {{ $report->type }} | {{ $report->province }}
+                                        {{ $report->province }} | {{ $report->type }} 
                                     </div>
 
                                     @if ($report->image)
@@ -124,7 +124,7 @@
                         @endforeach
 
                         <div class="d-flex justify-content-center mt-4">
-                            {{ $reports->links('pagination::simple-bootstrap-5') }}
+                            {{ $reports->appends(['PROVINCE' => request('PROVINCE')])->links('pagination::simple-bootstrap-5') }}
                         </div>
                     @endif
                 </div>

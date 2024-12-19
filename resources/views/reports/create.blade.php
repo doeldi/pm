@@ -76,8 +76,11 @@
             <div class="col-md-6">
                 <div class="form-group mb-3">
                     <label for="image">Gambar Pendukung</label>
-                    <input type="file" class="form-control" id="image" name="image" accept="image/*"
-                        value="{{ old('image') }}">
+                    <input type="file" class="form-control @error('image') is-invalid @enderror" id="image"
+                        name="image" accept="image/*" value="{{ old('image') }}">
+                    @error('image')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
             </div>
         </div>

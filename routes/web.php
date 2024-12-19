@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ResponseController;
+use App\Http\Controllers\CommentController;
 
 Route::middleware(['isAnonymous'])->group(function () {
     Route::get('/', function () {
@@ -23,11 +24,14 @@ Route::middleware(['isLogin'])->group(function () {
             Route::get('/article', [ReportController::class, 'index'])->name('data-report');
             Route::get('/create', [ReportController::class, 'create'])->name('create');
             Route::post('/store', [ReportController::class, 'store'])->name('store');
-            Route::post('/reports/{id}/comments', [ReportController::class, 'storeComment'])->name('storeComment');
             Route::get('/report/{id}', [ReportController::class, 'show'])->name('show');
             Route::delete('delete/{id}', [ReportController::class, 'destroy'])->name('destroy');
             Route::get('/report//me', [ReportController::class, 'myReports'])->name('myReports');
             Route::post('/reports/{id}/toggle-vote', [ReportController::class, 'toggleVote'])->name('toggleVote');
+
+            Route::post('/reports/{id}/comments', [CommentController::class, 'store'])->name('storeComment');
+            Route::delete('reports/comments/{commentId}/delete', [CommentController::class, 'destroy'])->name('deleteComment');
+            Route::patch('/reports/comments/{commentId}/update', [CommentController::class, 'update'])->name('updateComment');
         });
     });
 

@@ -42,7 +42,7 @@ class ReportController extends Controller
                 'regency'     => 'required|string|max:255',
                 'subdistrict' => 'required|string|max:255',
                 'village'     => 'required|string|max:255',
-                'image'       => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                'image'       => 'required|image|mimes:jpeg,png,jpg|max:2048',
                 'statement'   => 'required|boolean',
             ],
             [
@@ -52,6 +52,7 @@ class ReportController extends Controller
                 'regency.required'     => 'Kabupaten/Kota harus diisi.',
                 'subdistrict.required' => 'Kecamatan harus diisi.',
                 'village.required'     => 'Kelurahan/Desa harus diisi.',
+                'image.required'       => 'Gambar harus diunggah.',
                 'image.image'          => 'File harus berupa gambar.',
                 'image.mimes'          => 'Format gambar harus jpeg, png, atau jpg.',
                 'image.max'            => 'Ukuran gambar maksimal 2MB.',
@@ -78,7 +79,7 @@ class ReportController extends Controller
 
         $report->save();
 
-        return redirect()->back()->with('success', 'Laporan berhasil dibuat.');
+        return redirect()->route('report.myReports')->with('success', 'Laporan berhasil dibuat.');
     }
 
     /**
@@ -92,24 +93,6 @@ class ReportController extends Controller
         $report->save();
 
         return view('reports.show', compact('report'));
-    }
-
-
-    public function storeComment(Request $request, $id)
-    {
-        $request->validate([
-            'comment' => 'required|string|max:500',
-        ]);
-
-        $report = Report::findOrFail($id);
-
-        Comment::create([
-            'report_id' => $report->id,
-            'user_id' => auth()->id(),
-            'comment' => $request->comment,
-        ]);
-
-        return redirect()->route('report.show', $id)->with('success', 'Komentar berhasil ditambahkan.');
     }
 
     public function myReports()

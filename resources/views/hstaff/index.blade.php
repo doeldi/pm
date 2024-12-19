@@ -27,7 +27,7 @@
                     </div>
                 </div>
                 <div class="col-md-6">
-                    <div class="card bg-success text-white">
+                    <div class="card bg-response text-white">
                         <div class="card-body">
                             <h5 class="card-title">Total Tanggapan</h5>
                             <p class="card-text">{{ $statistics['totalResponses'] }}</p>
@@ -44,8 +44,15 @@
     @endif
 @endsection
 
+@push('styles')
+    <style>
+        .bg-response {
+            background-color: rgba(255, 99, 132, 0.5);
+        }
+    </style>
+@endpush
+
 @push('script')
-    {{-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> --}}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {

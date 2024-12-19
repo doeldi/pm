@@ -162,12 +162,20 @@
                                             </button>
                                             <ul class="dropdown-menu shadow border-0" aria-labelledby="actionMenu">
                                                 <li>
-                                                    @if ($report->responses && $report->responses->first())
+                                                    @if ($report->responses->isNotEmpty() && $report->responses->first()->response_status == 'ON_PROCESS')
                                                         <a href="{{ route('responses.show', $report->responses->first()->id) }}"
                                                             class="dropdown-item text-success d-flex align-items-center">
-                                                            <i class="fas fa-check-circle me-2"></i>
+                                                            <i class="fas fa-eye me-2"></i>
                                                             Lihat Progress
                                                         </a>
+                                                    @elseif ($report->responses->isNotEmpty() && $report->responses->first()->response_status == 'DONE')
+                                                        <div class="text-success d-inline-flex align-items-center">
+                                                            <i class="fas fa-check-circle me-2"></i>Selesai
+                                                        </div>
+                                                    @elseif ($report->responses->isNotEmpty() && $report->responses->first()->response_status == 'REJECT')
+                                                        <div class="text-danger d-inline-flex align-items-center">
+                                                            <i class="fas fa-warning me-2"></i>Ditolak
+                                                        </div>
                                                     @else
                                                         <a class="dropdown-item d-flex align-items-center" href="#"
                                                             data-bs-toggle="modal"

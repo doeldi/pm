@@ -44,7 +44,6 @@ class UserController extends Controller
 
     public function create()
     {
-        $user = Auth::user();
         $province = Auth::user()->staffProvinces->province;
 
         $staffs = User::where('role', 'STAFF')
@@ -62,8 +61,9 @@ class UserController extends Controller
     {
         $request->validate([
             'email' => 'required|email|unique:users,email',
-            'province' => 'required|string'
         ]);
+
+        $province = Auth::user()->staffProvinces->province;
 
         $user = User::create([
             'email' => $request->email,
@@ -73,12 +73,11 @@ class UserController extends Controller
 
         StaffProvince::create([
             'user_id' => $user->id,
-            'province' => $request->province,
+            'province' => $province,
         ]);
 
         return redirect()->route('staff.create')->with('success', 'Staff berhasil ditambahkan.');
     }
-
     // Reset password menjadi 4 kata awal dari email
     public function resetPassword(User $user)
     {

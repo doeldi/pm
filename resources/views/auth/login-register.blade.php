@@ -87,15 +87,11 @@
         <div class="login-form">
             <h2 class="login-title">Login / Register</h2>
 
-            @if ($errors->any())
-                <div class="alert alert-danger">
-                    <ul>
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
+            @error('email_password')
+                <div class="alert alert-danger mt-2">
+                    {{ $message }}
                 </div>
-            @endif
+            @enderror
 
             <form action="{{ route('auth.login.register') }}" method="POST" class="auth-form">
                 @csrf
@@ -115,34 +111,21 @@
                     {{-- <small class="text-muted"><a href="{{ route('password.request') }}">Lupa password?</a></small> --}}
                 </div>
 
-                <div id="confirm-password-section" class="form-group d-none">
-                    <label for="password_confirmation">Confirm Password</label>
-                    <input type="password" name="password_confirmation" id="password_confirmation" class="form-control">
-                </div>
-
                 <button type="submit" name="action" value="login" class="btn btn-primary btn-login">Login</button>
-                <button type="submit" name="action" value="register" class="btn text-primary btn-register mt-2">Register</button>
+                <button type="submit" name="action" value="register"
+                    class="btn text-primary btn-register mt-2">Register</button>
             </form>
         </div>
         <div class="login-content">
             <h1>Selamat Datang di Pengaduan Masyarakat</h1>
-            <p>Sampaikan laporan Anda langsung kepada instansi pemerintah berwenang. Login sekarang untuk mengakses akun Anda dan membuat pengaduan.</p>
+            <p>Sampaikan laporan Anda langsung kepada instansi pemerintah berwenang. Login sekarang untuk mengakses akun
+                Anda dan membuat pengaduan.</p>
         </div>
     </div>
 
     <script>
         const registerButton = document.querySelector('button[value="register"]');
         const loginButton = document.querySelector('button[value="login"]');
-        const confirmPasswordSection = document.getElementById('confirm-password-section');
-
-        // Show Confirm Password only for Register
-        registerButton.addEventListener('click', function () {
-            confirmPasswordSection.classList.remove('d-none');
-        });
-
-        loginButton.addEventListener('click', function () {
-            confirmPasswordSection.classList.add('d-none');
-        });
 
         function showPassword() {
             const passwordInput = document.getElementById('password');

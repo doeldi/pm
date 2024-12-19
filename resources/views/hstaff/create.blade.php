@@ -24,19 +24,13 @@
             <form action="{{ route('staff.store') }}" method="POST">
                 @csrf
                 <div class="row">
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-6 mb-3">
                         <label for="email" class="form-label">Email</label>
                         <input type="email" name="email" class="form-control" required>
                     </div>
-                    <div class="col-md-4 mb-3">
+                    <div class="col-md-6 mb-3">
                         <label for="password" class="form-label">Password</label>
                         <input type="password" name="password" class="form-control" required>
-                    </div>
-                    <div class="col-md-4 mb-3">
-                        <label for="province" class="form-label">Province</label>
-                        <select name="province" id="province" class="form-select" required>
-                            <option value="">Pilih Provinsi</option>
-                        </select>
                     </div>
                 </div>
                 <button type="submit" class="btn btn-primary">
@@ -57,7 +51,6 @@
                     <thead class="table-light">
                         <tr>
                             <th>Email</th>
-                            <th>Province</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -65,7 +58,6 @@
                         @foreach ($staffs as $staff)
                             <tr>
                                 <td>{{ $staff->email }}</td>
-                                <td>{{ $staff->staffProvinces->province ?? '-' }}</td>
                                 <td>
                                     <div class="btn-group" role="group">
                                         <!-- Tombol Reset Password -->

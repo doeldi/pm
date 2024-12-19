@@ -17,7 +17,7 @@ class AuthController extends Controller
     public function loginRegister(Request $request)
     {
         $action = $request->input('action');
- 
+
         if ($action === 'login') {
             $request->validate([
                 'email' => 'required|email',
@@ -34,11 +34,11 @@ class AuthController extends Controller
                 }
             }
 
-            return back()->withErrors(['email' => 'Email atau password salah.'])->withInput();
+            return back()->withErrors(['email_password' => 'Email atau password salah.'])->withInput();
         } elseif ($action === 'register') {
             $request->validate([
                 'email' => 'required|string|email|max:255|unique:users',
-                'password' => 'required|string|min:6|confirmed',
+                'password' => 'required|string|min:6',
             ]);
 
             $user = User::create([
@@ -48,19 +48,13 @@ class AuthController extends Controller
             ]);
 
             Auth::login($user);
-            if (Auth::user()->role === 'HEAD_STAFF') {
-                return redirect()->intended('/staff');
-            } elseif (Auth::user()->role === 'STAFF') {
-                return redirect()->intended('/responses/responses');
-            } else {
-                return redirect()->intended('/reports/article');
-            }
+            return redirect()->intended('/reports/article');
         }
 
         return back()->withErrors(['action' => 'Aksi tidak valid.']);
     }
 
-    
+
     public function logout()
     {
         Auth::logout();
