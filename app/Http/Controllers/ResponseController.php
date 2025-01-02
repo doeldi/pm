@@ -13,7 +13,7 @@ class ResponseController extends Controller
     /**
      * Display a listing of the responses.
      */
-    public function index()
+    public function index(Request $request)
     {
         // Ambil provinsi user login
         $user = Auth::user();
