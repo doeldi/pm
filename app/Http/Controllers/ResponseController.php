@@ -25,8 +25,21 @@ class ResponseController extends Controller
 
         // Ambil laporan dari provinsi user
         $reports = Report::with('responses', 'user')
-            ->where('province', $province)
-            ->get();
+            ->where('province', $province);
+
+        // Sort by voting
+        if ($request->has('sort')) {
+            switch ($request->sort) {
+                case 'voting_asc':
+                    $reports->orderBy('voting', 'asc');
+                    break;
+                case 'voting_desc':
+                    $reports->orderBy('voting', 'desc');
+                    break;
+            }
+        }
+
+        $reports = $reports->get();
 
         return view('response.index', compact('reports'));
     }
